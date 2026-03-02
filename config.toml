@@ -1,0 +1,17 @@
+# Painting Split — project config
+# Use Python 3.13 on this machine (create venv with: python3.13 -m venv .venv)
+
+[project]
+# Python version required by this app
+python_version = "3.13"
+# Set to the path of Python 3.13 on this machine (used to create .venv in this repo)
+python_interpreter_path = "/usr/local/bin/python3.13"
+
+# Optional tuning defaults (CLI flags override these)
+[tuning]
+# min_area_ratio = 0.05
+# canny_low = 50
+# canny_high = 150
+# padding = 0
+# max_deskew_degrees = 8.0
+# min_line_length_ratio = 0.12

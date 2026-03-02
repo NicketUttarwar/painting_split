@@ -1,0 +1,10 @@
+# Painting-split runtime dependencies (aligned with pyproject.toml).
+# Install with: pip install -r requirements.txt
+# For editable install: pip install -e .
+
+numpy>=2.0
+opencv-python>=4.10
+Pillow>=12.0
+scikit-image>=0.25
+scipy>=1.14
+matplotlib>=3.9
