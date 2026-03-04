@@ -1,0 +1,7 @@
+{
+  "status": "pending",
+  "description": "Compare original and overlay to assess whether drawn edges cover canvas edges.",
+  "edge_coverage_notes": null,
+  "original_path": "original.jpeg",
+  "overlay_path": "overlay.png"
+}

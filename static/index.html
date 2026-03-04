@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painting Split — Manually outline canvases</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --surface: #18181c;
+      --border: #2a2a30;
+      --text: #e4e4e7;
+      --muted: #71717a;
+      --accent: #a78bfa;
+      --accent-hover: #c4b5fd;
+      --success: #34d399;
+      --error: #f87171;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    .tech-stack {
+      margin: 0.35rem 0 0 0;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .tech-stack strong { color: var(--text); font-weight: 500; }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 280px 1fr 280px;
+      gap: 0;
+      min-height: 0;
+    }
+    .panel {
+      border-right: 1px solid var(--border);
+      padding: 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .panel:last-of-type { border-right: none; border-left: 1px solid var(--border); }
+    .panel h2 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin: 0 0 0.5rem 0;
+    }
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: rgba(167,139,250,0.06); }
+    .drop-zone input { display: none; }
+    .asset-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .asset-list li {
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      word-break: break-all;
+    }
+    .asset-list li:hover { background: var(--surface); }
+    .asset-list li.active { background: rgba(167,139,250,0.15); color: var(--accent); }
+    .canvas-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      min-height: 400px;
+      background: var(--surface);
+      position: relative;
+    }
+    #canvas {
+      max-width: 100%;
+      max-height: calc(100vh - 180px);
+      display: block;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    button {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    button:hover { background: var(--border); }
+    button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+    button.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .sections-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.8125rem;
+      font-family: "JetBrains Mono", monospace;
+    }
+    .sections-list li {
+      padding: 0.4rem 0.6rem;
+      border-radius: 4px;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      background: var(--surface);
+    }
+    .sections-list li .rot {
+      width: 4rem;
+      padding: 0.2rem;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+    }
+    .sections-list li .del { padding: 0.2rem 0.4rem; font-size: 0.75rem; }
+    .sections-list li.canvas-list-item { cursor: pointer; }
+    .sections-list li.canvas-list-item:hover { background: var(--border); }
+    .sections-list li.canvas-list-item.active { background: rgba(167,139,250,0.2); color: var(--accent); }
+    .canvas-color-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+    kbd { font-family: inherit; padding: 0.15rem 0.4rem; border-radius: 4px; background: var(--surface); border: 1px solid var(--border); font-size: 0.8em; }
+    .message {
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+    .message.success { background: rgba(52,211,153,0.15); color: var(--success); }
+    .message.error { background: rgba(248,113,113,0.15); color: var(--error); }
+    .message.info { background: rgba(167,139,250,0.12); color: var(--accent); }
+    .message a { color: var(--accent); }
+    #file-input { display: none; }
+    .instructions {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+    .instructions h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 0.5rem 0; }
+    .instructions p { margin: 0 0 0.35rem 0; }
+    .instructions .step-num { color: var(--accent); font-weight: 600; }
+    .step-progress {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.875rem;
+    }
+    .step-progress .step {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--muted);
+    }
+    .step-progress .step.current { color: var(--accent); font-weight: 600; }
+    .step-progress .step.done { color: var(--success); }
+    .step-progress .step .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--text);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .step-progress .step.current .num { background: var(--accent); color: var(--bg); }
+    .step-progress .step.done .num { background: var(--success); color: var(--bg); }
+    .step-progress .sep { color: var(--border); font-weight: 300; }
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,15,18,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .loading-overlay.visible { opacity: 1; pointer-events: auto; }
+    .loading-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 90%;
+    }
+    .loading-box.auto-detect-progress {
+      flex-direction: column;
+      align-items: stretch;
+      max-width: 640px;
+      max-height: 88vh;
+      overflow: hidden;
+    }
+    .loading-box-head {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .loading-box.auto-detect-progress .loading-box-head { flex-shrink: 0; }
+    .loading-box.auto-detect-progress .loading-box-head span { flex: 1; }
+    .auto-detect-log {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-y: auto;
+      max-height: 420px;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+    }
+    .auto-detect-log .log-entry {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border-left: 3px solid var(--border);
+      background: var(--surface);
+    }
+    .auto-detect-log .log-entry.iteration-start { border-left-color: var(--accent); }
+    .auto-detect-log .log-entry.iteration-done { border-left-color: var(--success); }
+    .auto-detect-log .log-entry.done { border-left-color: var(--success); }
+    .auto-detect-log .log-entry.error { border-left-color: var(--error); }
+    .auto-detect-log .log-entry h4 {
+      margin: 0 0 0.35rem 0;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .auto-detect-log .log-entry .msg { margin: 0.25rem 0 0 0; color: var(--text); }
+    .auto-detect-log .log-entry .prompt-pre {
+      margin: 0.5rem 0 0 0;
+      padding: 0.5rem 0.75rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.7rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow-y: auto;
+      background: var(--bg);
+      border-radius: 4px;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-box span { color: var(--text); font-size: 0.9375rem; }
+    .viewfinder {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 100%;
+      max-width: 100%;
+    }
+    .viewfinder.visible {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+    .viewfinder h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin: 0 0 0.5rem 0;
+      width: 100%;
+    }
+    .viewfinder-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .viewfinder-item:hover {
+      border-color: var(--accent);
+      background: rgba(167,139,250,0.08);
+    }
+    .viewfinder-item.highlighted {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(167,139,250,0.3);
+    }
+    .viewfinder-item canvas {
+      display: block;
+      border-radius: 4px;
+      max-width: 120px;
+      max-height: 80px;
+      width: auto;
+      height: auto;
+    }
+    .viewfinder-item span {
+      font-size: 0.75rem;
+      font-family: "JetBrains Mono", monospace;
+      color: var(--muted);
+    }
+    .activity-log {
+      margin: 0;
+      padding: 0.5rem 0 0 0;
+      list-style: none;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+      color: var(--muted);
+      max-height: 220px;
+      overflow-y: auto;
+      border-top: 1px solid var(--border);
+      margin-top: 0.75rem;
+    }
+    .activity-log li {
+      padding: 0.35rem 0;
+      border-bottom: 1px solid rgba(42,42,48,0.6);
+      padding-left: 1rem;
+      position: relative;
+    }
+    .activity-log li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    #activity-log-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin: 1rem 0 0.35rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-overlay" id="loading-overlay" aria-live="polite">
+    <div class="loading-box" id="loading-box">
+      <div class="loading-box-head" id="loading-box-head">
+        <div class="spinner" id="loading-spinner" aria-hidden="true"></div>
+        <span id="loading-text">Loading…</span>
+      </div>
+    </div>
+  </div>
+  <header>
+    <h1>Painting Split</h1>
+    <span class="subtitle">Outline one or more canvases in a photo with your mouse, then export each as a separate image</span>
+    <p class="tech-stack">Upload an image, draw one or more canvas outlines (drag corners to fix perspective), then export.</p>
+  </header>
+  <main>
+    <aside class="panel">
+      <h2>Image</h2>
+      <div class="instructions" id="instructions-left">
+        <h3>Step 1 — Choose or upload a photo</h3>
+        <p>Drop an image here or click to upload. Or pick from the list. The image loads in the center so you can outline one or more canvases with your mouse.</p>
+      </div>
+      <div class="drop-zone" id="drop-zone">
+        Drop image here or click to upload
+        <input type="file" id="file-input" accept="image/*" />
+      </div>
+      <p style="font-size:0.75rem; color: var(--muted); margin:0.25rem 0 0 0;">Inputs (<code>data/inputs/</code>)</p>
+      <ul class="asset-list" id="input-list"></ul>
+      <p style="font-size:0.75rem; color: var(--muted); margin:0.5rem 0 0 0;">Legacy assets (<code>assets/</code>)</p>
+      <ul class="asset-list" id="asset-list"></ul>
+    </aside>
+    <section class="canvas-wrap">
+      <div style="display: flex; flex-direction: column; width: 100%; max-width: 100%; align-items: center;">
+        <div class="step-progress" id="step-progress" aria-label="Progress through steps">
+          <span class="step" id="step-1" data-step="1"><span class="num">1</span> Choose image</span>
+          <span class="sep" aria-hidden="true">→</span>
+          <span class="step" id="step-2" data-step="2"><span class="num">2</span> Draw sections</span>
+          <span class="sep" aria-hidden="true">→</span>
+          <span class="step" id="step-3" data-step="3"><span class="num">3</span> Export</span>
+        </div>
+        <div class="instructions" id="instructions-center">
+          <h3>Current step</h3>
+          <p id="step-text">Select an image from the <strong>Assets</strong> panel (left), or drop one in the upload area. The image will load here and you can draw sections on it.</p>
+        </div>
+        <div class="toolbar" style="align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <button type="button" id="btn-export" disabled>Export canvases</button>
+        </div>
+        <p style="font-size:0.75rem; color: var(--muted); margin-bottom:0.5rem;">Click <strong>4 corners</strong> on the image to add each canvas (e.g. top-left, top-right, bottom-right, bottom-left). After the 4th click the next canvas starts automatically. Each canvas has a different color. Click one to select and drag corners to adjust. <strong>Export canvases</strong> saves to <code>outputs/</code>.</p>
+        <canvas id="canvas"></canvas>
+        <div class="viewfinder" id="viewfinder" aria-label="Canvas previews">
+          <h3>Canvas previews</h3>
+          <div id="viewfinder-thumbs"></div>
+        </div>
+        <p id="canvas-hint" style="color: var(--muted); font-size: 0.875rem; margin-top: 0.5rem;">Select an image (left) or drop one to start. Click 4 corners to add each canvas; after the 4th click the next canvas starts automatically. Click a canvas to select it (different colors). Press <kbd>Esc</kbd> to cancel placing.</p>
+      </div>
+    </section>
+    <aside class="panel">
+      <h2>Canvases</h2>
+      <div class="instructions" id="instructions-right">
+        <h3>Step 2 — Canvases you outlined</h3>
+        <p>Each canvas is defined by 4 clicks (corners). Colors differentiate canvases; the selected one has a white dashed outline. Click a canvas in the list or on the image to select it, then drag corner handles to adjust. <strong>Export canvases</strong> saves each to <code>outputs/</code>.</p>
+      </div>
+      <ul class="sections-list" id="sections-list"></ul>
+      <div id="message"></div>
+      <h3 id="activity-log-title">Activity — step-by-step log</h3>
+      <ul class="activity-log" id="activity-log" aria-live="polite"></ul>
+    </aside>
+  </main>
+  <script>
+    const API = "";
+    const inputListEl = document.getElementById("input-list");
+    const assetListEl = document.getElementById("asset-list");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const dropZone = document.getElementById("drop-zone");
+    const fileInput = document.getElementById("file-input");
+    const sectionsListEl = document.getElementById("sections-list");
+    const btnExport = document.getElementById("btn-export");
+    const messageEl = document.getElementById("message");
+    const loadingOverlay = document.getElementById("loading-overlay");
+    const loadingBox = document.getElementById("loading-box");
+    const loadingText = document.getElementById("loading-text");
+    const stepText = document.getElementById("step-text");
+    const canvasHint = document.getElementById("canvas-hint");
+    const viewfinderEl = document.getElementById("viewfinder");
+    const viewfinderThumbsEl = document.getElementById("viewfinder-thumbs");
+    const step1El = document.getElementById("step-1");
+    const step2El = document.getElementById("step-2");
+    const step3El = document.getElementById("step-3");
+    const activityLogEl = document.getElementById("activity-log");
+    const MAX_ACTIVITY_ENTRIES = 30;
+
+    let currentPath = null;
+    /** When set, the canvas shows the corrected image and export uses it for splitting. */
+    let currentCorrectedPath = null;
+    let imgElement = null;
+    let scale = 1;
+    let sections = [];
+    let drawing = false;
+
+    /** Normalize section from API or bounds format to flat { x, y, width, height, corners? }. */
+    function normalizeSection(s) {
+      const b = s.bounds || s;
+      let x = Number(b.x ?? s.x ?? 0), y = Number(b.y ?? s.y ?? 0);
+      let width = Math.max(1, Number(b.width ?? s.width ?? 1)), height = Math.max(1, Number(b.height ?? s.height ?? 1));
+      if (Array.isArray(s.corners) && s.corners.length === 4) {
+        const xs = s.corners.map(c => c[0]);
+        const ys = s.corners.map(c => c[1]);
+        x = Math.min(...xs);
+        y = Math.min(...ys);
+        width = Math.max(...xs) - x;
+        height = Math.max(...ys) - y;
+      }
+      const out = { x, y, width: Math.max(1, width), height: Math.max(1, height) };
+      if (Array.isArray(s.corners) && s.corners.length === 4) out.corners = s.corners;
+      return out;
+    }
+    /** 4-click mode: array of [x,y] corners (0–4). When length 4, next click adds canvas and clears. */
+    let currentCornerPoints = [];
+    let highlightedSectionIndex = -1;
+    /** When non-null, user is dragging a corner of a section for perspective adjustment. */
+    let draggingCorner = null;
+    /** Mouse position in canvas coords for preview line while placing corners. */
+    let lastMouseX = -1, lastMouseY = -1;
+    /** Distinct colors per canvas (cycle by index) for easy differentiation. */
+    const CANVAS_COLORS = [
+      { stroke: "#a78bfa", fill: "rgba(167,139,250,0.35)" },   // purple
+      { stroke: "#34d399", fill: "rgba(52,211,153,0.35)" },   // green
+      { stroke: "#f59e0b", fill: "rgba(245,158,11,0.35)" },  // amber
+      { stroke: "#06b6d4", fill: "rgba(6,182,212,0.35)" },    // cyan
+      { stroke: "#ec4899", fill: "rgba(236,72,153,0.35)" },   // pink
+      { stroke: "#84cc16", fill: "rgba(132,204,22,0.35)" },    // lime
+    ];
+    /** Hit-test radius for corner handles (canvas coords) — large for easy grab and touch. */
+    const CORNER_HANDLE_RADIUS = 24;
+    /** Drawn radius of corner handles (pixels). */
+    const CORNER_HANDLE_DRAW_RADIUS = 11;
+    /** Drawn radius when actively dragging a corner. */
+    const CORNER_HANDLE_DRAGGING_RADIUS = 15;
+
+    function setLoading(visible, text) {
+      loadingText.textContent = text || "Loading…";
+      loadingOverlay.classList.toggle("visible", !!visible);
+    }
+
+    function updateStepProgress() {
+      const hasImage = !!imgElement;
+      const hasSections = sections.length > 0;
+      [step1El, step2El, step3El].forEach((el, i) => {
+        if (!el) return;
+        el.classList.remove("current", "done");
+        const n = i + 1;
+        if (n === 1) {
+          if (!hasImage) el.classList.add("current");
+          else el.classList.add("done");
+        } else if (n === 2) {
+          if (!hasImage) { /* inactive */ }
+          else if (!hasSections) el.classList.add("current");
+          else el.classList.add("done");
+        } else if (n === 3) {
+          if (hasImage && hasSections) el.classList.add("current");
+        }
+      });
+    }
+
+    function updateStepAndHint() {
+      updateStepProgress();
+      if (!imgElement) {
+        stepText.innerHTML = "Select an image from the list (left) or drop one in the upload area. Then click 4 corners on the image to outline each canvas.";
+        if (canvasHint) canvasHint.textContent = "Select an image or drop one to start. Click 4 corners per canvas; each canvas gets a different color.";
+        return;
+      }
+      if (currentCornerPoints.length > 0) {
+        const n = currentCornerPoints.length + 1;
+        stepText.innerHTML = "Placing canvas: click to set <strong>corner " + n + " of 4</strong>. Order: top-left → top-right → bottom-right → bottom-left (or any order around the canvas edge).";
+        if (canvasHint) canvasHint.textContent = "Click on the image to place corner " + n + " of 4.";
+      } else if (sections.length === 0) {
+        stepText.innerHTML = "Image loaded. <strong>Click 4 corners</strong> on the image to outline your first canvas (e.g. top-left, top-right, bottom-right, bottom-left). Each canvas is 4 clicks.";
+        if (canvasHint) canvasHint.textContent = "Click four corners on the image to add a canvas. After the 4th click, the next canvas starts automatically.";
+      } else {
+        stepText.innerHTML = "You have <strong>" + sections.length + " canvas/canvases</strong>. Click on the image to add another (4 clicks) or click a canvas to select and adjust corners. Then <strong>Export canvases</strong>.";
+        if (canvasHint) canvasHint.textContent = "Click 4 corners to add a canvas, or click an existing one to select it. Each canvas has a different color.";
+      }
+    }
+
+    function showMessage(text, type = "success") {
+      messageEl.innerHTML = text;
+      messageEl.className = "message " + type;
+    }
+    function clearMessage() {
+      messageEl.innerHTML = "";
+      messageEl.className = "";
+    }
+    /** Append a step to the activity log and optionally show in message area. */
+    function logStep(text, alsoShowInMessage = false) {
+      if (!activityLogEl) return;
+      const li = document.createElement("li");
+      li.textContent = text;
+      activityLogEl.insertBefore(li, activityLogEl.firstChild);
+      while (activityLogEl.children.length > MAX_ACTIVITY_ENTRIES) {
+        activityLogEl.removeChild(activityLogEl.lastChild);
+      }
+      if (alsoShowInMessage) showMessage(text, "info");
+    }
+
+    async function listInputs() {
+      try {
+        const r = await fetch(API + "/api/inputs");
+        const list = (await r.json()) || [];
+        const pathKey = (a) => (a.path || "inputs/" + (a.name || "")).replace(/^\/+/, "");
+        inputListEl.innerHTML = list.map(a => {
+          const path = pathKey(a);
+          return `<li data-path="${escapeAttr(path)}">${escapeHtml(a.name || path)}</li>`;
+        }).join("");
+        inputListEl.querySelectorAll("li").forEach(li => {
+          li.addEventListener("click", () => selectAsset(li.dataset.path));
+        });
+      } catch (e) {
+        inputListEl.innerHTML = "<li style='color:var(--muted)'>Could not load inputs.</li>";
+      }
+    }
+
+    async function listAssets() {
+      setLoading(true, "Loading images…");
+      logStep("Loading list of inputs and assets…");
+      await listInputs();
+      try {
+        const r = await fetch(API + "/api/assets");
+        const list = (await r.json()) || [];
+        const pathKey = (a) => (a.path || "assets/" + (a.name || "")).replace(/^\/+/, "");
+        assetListEl.innerHTML = list.map(a => {
+          const path = pathKey(a);
+          return `<li data-path="${escapeAttr(path)}">${escapeHtml(a.name || path)}</li>`;
+        }).join("");
+        assetListEl.querySelectorAll("li").forEach(li => {
+          li.addEventListener("click", () => selectAsset(li.dataset.path));
+        });
+        const inputCount = (await fetch(API + "/api/inputs").then(r => r.json()).catch(() => [])).length;
+        if (list.length === 0 && inputCount === 0) {
+          logStep("Step 1: No images yet. Drop an image in the upload area.", true);
+          showMessage("No images yet. Drop an image in the upload area.", "info");
+        } else {
+          logStep("Step 1: Loaded inputs and assets. Select an image or drop one to upload.");
+        }
+      } catch (e) {
+        logStep("Error: Could not load lists. Make sure the server is running.", true);
+        assetListEl.innerHTML = "<li style='color:var(--muted)'>Could not load assets. Is the app running?</li>";
+        showMessage("Could not load lists. Make sure the server is running.", "error");
+      }
+      setLoading(false);
+      updateStepAndHint();
+    }
+
+    function escapeAttr(s) { return String(s).replace(/"/g, "&quot;"); }
+    function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+    dropZone.addEventListener("click", () => fileInput.click());
+    dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+    dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+    dropZone.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      const file = e.dataTransfer?.files?.[0] || fileInput.files?.[0];
+      if (!file || !file.type.startsWith("image/")) return;
+      setLoading(true, "Uploading to inputs…");
+      clearMessage();
+      logStep("Uploading \"" + (file.name || "image") + "\" to data/inputs/…");
+      const fd = new FormData();
+      fd.append("file", file);
+      try {
+        const r = await fetch(API + "/api/inputs", { method: "POST", body: fd });
+        const data = await r.json();
+        if (data.error) throw new Error(data.error);
+        logStep("Upload complete. Loading image on canvas…");
+        showMessage("Upload complete. Loading image…", "info");
+        await listInputs();
+        await listAssets();
+        await selectAsset(data.path || ("inputs/" + (data.name || "upload.png")));
+        logStep("Step 1 complete: New image loaded. Draw rectangles to outline canvases.", true);
+        showMessage("Image ready. Draw rectangles to add canvases, then Export when done.", "success");
+      } catch (err) {
+        logStep("Upload failed: " + err.message, true);
+        showMessage("Upload failed: " + err.message, "error");
+      }
+      setLoading(false);
+    });
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files?.[0];
+      if (!file || !file.type.startsWith("image/")) return;
+      setLoading(true, "Uploading to inputs…");
+      clearMessage();
+      logStep("Uploading \"" + (file.name || "image") + "\" to data/inputs/…");
+      const fd = new FormData();
+      fd.append("file", file);
+      try {
+        const r = await fetch(API + "/api/inputs", { method: "POST", body: fd });
+        const data = await r.json();
+        if (data.error) throw new Error(data.error);
+        logStep("Upload complete. Loading image…");
+        showMessage("Upload complete. Loading image…", "info");
+        await listInputs();
+        await listAssets();
+        await selectAsset(data.path || ("inputs/" + (data.name || "upload.png")));
+        logStep("Step 1 complete: New image loaded. Draw rectangles to outline canvases.", true);
+        showMessage("Image ready. Draw rectangles to add canvases, then Export when done.", "success");
+      } catch (err) {
+        logStep("Upload failed: " + err.message, true);
+        showMessage("Upload failed: " + err.message, "error");
+      }
+      fileInput.value = "";
+      setLoading(false);
+    });
+
+    function pathToUrl(path) {
+      if (!path) return "";
+      const p = String(path).trim();
+      if (p.startsWith("inputs/")) {
+        const name = p.replace(/^inputs\/?/, "");
+        return (API + "/api/inputs/" + name).replace(/\/+/g, "/");
+      }
+      const name = p.replace(/^assets\/?/, "");
+      return (API + "/api/assets/" + name).replace(/\/+/g, "/");
+    }
+    function assetPathToUrl(path) {
+      return pathToUrl(path || currentPath);
+    }
+    function correctedPathToUrl(correctedPath) {
+      const name = (correctedPath || "").replace(/^outputs\/?/, "");
+      return (API + "/api/outputs/" + name).replace(/\/+/g, "/");
+    }
+
+    async function selectAsset(path) {
+      if (!path) return;
+      const name = path.replace(/^.*\//, "") || path;
+      currentPath = path;
+      currentCorrectedPath = null;
+      document.querySelectorAll("#input-list li, #asset-list li").forEach(li => { li.classList.toggle("active", li.dataset.path === path); });
+      setLoading(true, "Loading image \"" + name + "\" onto the canvas…");
+      clearMessage();
+      logStep("Loading image \"" + name + "\" from assets/…");
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = pathToUrl(path);
+      try {
+        await new Promise((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error("Image failed to load"));
+          if (img.complete && img.naturalWidth) resolve();
+        });
+      } catch (e) {
+        setLoading(false);
+        logStep("Error: Could not load image \"" + name + "\". " + (e.message || "check path"), true);
+        showMessage("Could not load image: " + (e.message || "check path"), "error");
+        updateStepAndHint();
+        return;
+      }
+      imgElement = img;
+      const maxW = (canvas.parentElement && canvas.parentElement.clientWidth) ? canvas.parentElement.clientWidth - 32 : 800;
+      const maxH = window.innerHeight - 220;
+      scale = Math.min(1, maxW / img.width, maxH / img.height);
+      canvas.width = img.width;
+      canvas.height = img.height;
+      canvas.style.width = (img.width * scale) + "px";
+      canvas.style.height = (img.height * scale) + "px";
+      sections = [];
+      highlightedSectionIndex = -1;
+      currentCornerPoints = [];
+      btnExport.disabled = false;
+      redraw();
+      renderSectionsList();
+      setLoading(false);
+      logStep("Step 1 complete: Image \"" + name + "\" loaded (" + img.width + "×" + img.height + "). Click 4 corners on the image to add a canvas.", true);
+      showMessage("Image loaded. Click 4 corners to outline each canvas (order: e.g. top-left, top-right, bottom-right, bottom-left).", "info");
+      updateStepAndHint();
+    }
+
+    function toCanvasCoords(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (clientX - rect.left) / scale,
+        y: (clientY - rect.top) / scale
+      };
+    }
+
+    /** Point-in-polygon (ray casting). pts = [[x,y], ...] in order. */
+    function pointInPoly(px, py, pts) {
+      let inside = false;
+      const n = pts.length;
+      for (let i = 0, j = n - 1; i < n; j = i++) {
+        const xi = pts[i][0], yi = pts[i][1];
+        const xj = pts[j][0], yj = pts[j][1];
+        if (((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / (yj - yi) + xi)) inside = !inside;
+      }
+      return inside;
+    }
+
+    /** Return section index at (x, y), or -1. Checks from topmost (last drawn) backward. */
+    function sectionAtPoint(x, y) {
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const s = normalizeSection(sections[i]);
+        if (s.corners && s.corners.length === 4) {
+          if (pointInPoly(x, y, s.corners)) return i;
+        } else {
+          if (x >= s.x && x <= s.x + s.width && y >= s.y && y <= s.y + s.height) return i;
+        }
+      }
+      return -1;
+    }
+
+    /** If (x,y) is near a corner of the highlighted section, return { sectionIndex, cornerIndex }. */
+    function getCornerAt(x, y) {
+      if (highlightedSectionIndex < 0 || highlightedSectionIndex >= sections.length) return null;
+      const s = sections[highlightedSectionIndex];
+      const sn = normalizeSection(s);
+      const pts = sn.corners && sn.corners.length === 4 ? sn.corners : [[sn.x, sn.y], [sn.x + sn.width, sn.y], [sn.x + sn.width, sn.y + sn.height], [sn.x, sn.y + sn.height]];
+      for (let j = 0; j < pts.length; j++) {
+        const dx = x - pts[j][0], dy = y - pts[j][1];
+        if (dx * dx + dy * dy <= CORNER_HANDLE_RADIUS * CORNER_HANDLE_RADIUS) return { sectionIndex: highlightedSectionIndex, cornerIndex: j };
+      }
+      return null;
+    }
+
+    function handlePointerDown(clientX, clientY) {
+      if (!imgElement) return;
+      const { x, y } = toCanvasCoords(clientX, clientY);
+
+      if (currentCornerPoints.length > 0) {
+        currentCornerPoints.push([x, y]);
+        if (currentCornerPoints.length === 4) {
+          const pts = currentCornerPoints;
+          const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+          const x = Math.min(...xs), y = Math.min(...ys), w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+          const newIdx = sections.length;
+          sections.push({
+            x, y, width: w, height: h,
+            corners: [[pts[0][0], pts[0][1]], [pts[1][0], pts[1][1]], [pts[2][0], pts[2][1]], [pts[3][0], pts[3][1]]]
+          });
+          currentCornerPoints = [];
+          redraw();
+          renderSectionsList();
+          updateStepAndHint();
+          logStep("Canvas " + (newIdx + 1) + " added (4 corners). Click to place corner 1 of next canvas, or click an existing canvas to select it.", true);
+          showMessage("Canvas " + (newIdx + 1) + " added. Click 4 more corners for the next canvas, or click a canvas to edit.", "success");
+        } else {
+          redraw();
+          updateStepAndHint();
+        }
+        return;
+      }
+
+      const corner = getCornerAt(x, y);
+      if (corner) {
+        draggingCorner = corner;
+        redraw();
+        return;
+      }
+      const hit = sectionAtPoint(x, y);
+      if (hit >= 0) {
+        highlightedSectionIndex = hit;
+        const s = sections[hit];
+        if ((!s.corners || s.corners.length !== 4) && s.x != null && s.width != null) {
+          s.corners = [[s.x, s.y], [s.x + s.width, s.y], [s.x + s.width, s.y + s.height], [s.x, s.y + s.height]];
+        }
+        redraw();
+        renderSectionsList();
+        if (viewfinderEl) viewfinderEl.querySelectorAll(".viewfinder-item").forEach((el, idx) => {
+          el.classList.toggle("highlighted", idx === highlightedSectionIndex);
+        });
+        logStep("Canvas " + (hit + 1) + " selected. Drag corner handles to adjust, or click empty area to start a new canvas (4 clicks).", true);
+        showMessage("Canvas " + (hit + 1) + " selected. Drag corners to adjust.", "info");
+        return;
+      }
+      highlightedSectionIndex = -1;
+      currentCornerPoints = [[x, y]];
+      redraw();
+      updateStepAndHint();
+      logStep("Started new canvas. Click to place corner 2 of 4.", true);
+      showMessage("Corner 1 placed. Click corner 2, then 3, then 4 (e.g. around the canvas edge).", "info");
+    }
+    function handlePointerMove(clientX, clientY) {
+      const { x, y } = toCanvasCoords(clientX, clientY);
+      lastMouseX = x;
+      lastMouseY = y;
+      if (draggingCorner !== null && imgElement) {
+        canvas.style.cursor = "move";
+        const s = sections[draggingCorner.sectionIndex];
+        if (!s.corners) s.corners = [[s.x,s.y],[s.x+s.width,s.y],[s.x+s.width,s.y+s.height],[s.x,s.y+s.height]];
+        s.corners[draggingCorner.cornerIndex] = [x, y];
+        redraw();
+        renderSectionsList();
+        return;
+      }
+      if (getCornerAt(x, y)) {
+        canvas.style.cursor = "move";
+        return;
+      }
+      canvas.style.cursor = "crosshair";
+      if (currentCornerPoints.length > 0) redraw();
+    }
+    function handlePointerUp(clientX, clientY) {
+      if (draggingCorner !== null) {
+        const secNum = draggingCorner.sectionIndex + 1;
+        draggingCorner = null;
+        redraw();
+        logStep("Corner updated for canvas " + secNum + ". Export will warp this quad to a perfect rectangle.", true);
+        showMessage("Corner updated. Export will warp this canvas to a perfect rectangle.", "info");
+        return;
+      }
+    }
+
+    canvas.addEventListener("mousedown", (e) => { handlePointerDown(e.clientX, e.clientY); });
+    canvas.addEventListener("mousemove", (e) => { handlePointerMove(e.clientX, e.clientY); });
+    canvas.addEventListener("mouseup", (e) => { handlePointerUp(e.clientX, e.clientY); });
+    canvas.addEventListener("mouseleave", () => { draggingCorner = null; lastMouseX = -1; lastMouseY = -1; redraw(); });
+
+    canvas.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+      handlePointerDown(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    canvas.addEventListener("touchmove", (e) => {
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+      handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    canvas.addEventListener("touchend", (e) => {
+      if (e.changedTouches.length !== 1) return;
+      e.preventDefault();
+      handlePointerUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    }, { passive: false });
+    canvas.addEventListener("touchcancel", () => { draggingCorner = null; redraw(); });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && currentCornerPoints.length > 0) {
+        currentCornerPoints = [];
+        redraw();
+        updateStepAndHint();
+        logStep("Placing cancelled. Click on the image to start a new canvas (4 clicks).", true);
+        showMessage("Placing cancelled.", "info");
+      }
+    });
+
+    function redraw() {
+      if (!imgElement) return;
+      ctx.drawImage(imgElement, 0, 0);
+      ctx.font = "14px JetBrains Mono";
+      sections.forEach((s, i) => {
+        const sn = normalizeSection(s);
+        const isHighlighted = i === highlightedSectionIndex;
+        const colorSet = CANVAS_COLORS[i % CANVAS_COLORS.length];
+        if (sn.corners && sn.corners.length === 4) {
+          const pts = sn.corners;
+          ctx.beginPath();
+          ctx.moveTo(pts[0][0], pts[0][1]);
+          for (let j = 1; j < pts.length; j++) ctx.lineTo(pts[j][0], pts[j][1]);
+          ctx.closePath();
+          ctx.fillStyle = colorSet.fill;
+          ctx.fill();
+          ctx.strokeStyle = colorSet.stroke;
+          ctx.lineWidth = isHighlighted ? 5 : 3;
+          ctx.stroke();
+          if (isHighlighted) {
+            ctx.setLineDash([8, 6]);
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+          const midX = (pts[0][0] + pts[1][0] + pts[2][0] + pts[3][0]) / 4;
+          const midY = (pts[0][1] + pts[1][1] + pts[2][1] + pts[3][1]) / 4;
+          ctx.fillStyle = "#fff";
+          ctx.strokeStyle = "#000";
+          ctx.lineWidth = 2;
+          ctx.strokeText(String(i), midX - 4, midY + 4);
+          ctx.fillText(String(i), midX - 4, midY + 4);
+          if (isHighlighted) {
+            pts.forEach((c, j) => {
+              const isDragging = draggingCorner !== null && draggingCorner.sectionIndex === i && draggingCorner.cornerIndex === j;
+              const r = isDragging ? CORNER_HANDLE_DRAGGING_RADIUS : CORNER_HANDLE_DRAW_RADIUS;
+              ctx.beginPath();
+              ctx.arc(c[0], c[1], r, 0, 2 * Math.PI);
+              ctx.fillStyle = isDragging ? colorSet.stroke : "#fff";
+              ctx.fill();
+              ctx.strokeStyle = isDragging ? "#fff" : "#000";
+              ctx.lineWidth = isDragging ? 3 : 2;
+              ctx.stroke();
+            });
+          }
+        } else {
+          ctx.fillStyle = colorSet.fill;
+          ctx.fillRect(sn.x, sn.y, sn.width, sn.height);
+          ctx.strokeStyle = colorSet.stroke;
+          ctx.lineWidth = isHighlighted ? 5 : 3;
+          ctx.strokeRect(sn.x, sn.y, sn.width, sn.height);
+          if (isHighlighted) {
+            ctx.setLineDash([8, 6]);
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(sn.x, sn.y, sn.width, sn.height);
+            ctx.setLineDash([]);
+          }
+          ctx.fillStyle = "#fff";
+          ctx.fillText(String(i), sn.x + 4, sn.y + 18);
+        }
+      });
+      if (currentCornerPoints.length > 0) {
+        const pts = currentCornerPoints;
+        ctx.strokeStyle = "#a78bfa";
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 4]);
+        if (pts.length >= 2) {
+          ctx.beginPath();
+          ctx.moveTo(pts[0][0], pts[0][1]);
+          for (let k = 1; k < pts.length; k++) ctx.lineTo(pts[k][0], pts[k][1]);
+          if (pts.length < 4 && lastMouseX >= 0 && lastMouseY >= 0) ctx.lineTo(lastMouseX, lastMouseY);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        pts.forEach((p, k) => {
+          ctx.beginPath();
+          ctx.arc(p[0], p[1], 8, 0, 2 * Math.PI);
+          ctx.fillStyle = "#a78bfa";
+          ctx.fill();
+          ctx.strokeStyle = "#fff";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 12px JetBrains Mono";
+          ctx.fillText(String(k + 1), p[0] - 4, p[1] + 4);
+        });
+      }
+      renderViewfinder();
+    }
+
+    const THUMB_MAX_W = 120;
+    const THUMB_MAX_H = 80;
+
+    function renderViewfinder() {
+      if (!viewfinderEl || !viewfinderThumbsEl) return;
+      if (!imgElement || sections.length === 0) {
+        viewfinderEl.classList.remove("visible");
+        viewfinderThumbsEl.innerHTML = "";
+        return;
+      }
+      viewfinderEl.classList.add("visible");
+      viewfinderThumbsEl.innerHTML = "";
+      sections.forEach((s, i) => {
+        const sn = normalizeSection(s);
+        const displayW = sn.width;
+        const displayH = sn.height;
+        if (displayW <= 0 || displayH <= 0) return;
+        const scaleThumb = Math.min(THUMB_MAX_W / displayW, THUMB_MAX_H / displayH, 1);
+        const sx = Number.isFinite(scaleThumb) ? scaleThumb : 1;
+        const sy = Number.isFinite(scaleThumb) ? scaleThumb : 1;
+        const thumbW = Math.max(1, Math.round(displayW * sx));
+        const thumbH = Math.max(1, Math.round(displayH * sy));
+        const wrap = document.createElement("div");
+        wrap.className = "viewfinder-item" + (i === highlightedSectionIndex ? " highlighted" : "");
+        wrap.setAttribute("role", "button");
+        wrap.setAttribute("tabindex", "0");
+        wrap.setAttribute("aria-label", "Canvas " + (i + 1) + " preview");
+        const label = document.createElement("span");
+        label.textContent = "#" + i + " " + Math.round(sn.width) + "×" + Math.round(sn.height);
+        const thumb = document.createElement("canvas");
+        thumb.width = thumbW;
+        thumb.height = thumbH;
+        const tctx = thumb.getContext("2d");
+        if (!tctx) return;
+        tctx.save();
+        tctx.scale(sx, sy);
+        tctx.drawImage(imgElement, sn.x, sn.y, sn.width, sn.height, 0, 0, sn.width, sn.height);
+        tctx.restore();
+        wrap.appendChild(thumb);
+        wrap.appendChild(label);
+        wrap.addEventListener("click", () => {
+          highlightedSectionIndex = highlightedSectionIndex === i ? -1 : i;
+          viewfinderEl.querySelectorAll(".viewfinder-item").forEach((el, idx) => {
+            el.classList.toggle("highlighted", idx === highlightedSectionIndex);
+          });
+          redraw();
+          logStep("Canvas " + (i + 1) + " selected from viewfinder. Drag its corners on the image to adjust.");
+        });
+        wrap.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            wrap.click();
+          }
+        });
+        viewfinderThumbsEl.appendChild(wrap);
+      });
+    }
+
+    function renderSectionsList() {
+      sectionsListEl.innerHTML = sections.map((s, i) => {
+        const sn = normalizeSection(s);
+        const isActive = i === highlightedSectionIndex;
+        const col = CANVAS_COLORS[i % CANVAS_COLORS.length];
+        return `
+        <li class="canvas-list-item ${isActive ? "active" : ""}" data-i="${i}" role="button" tabindex="0" aria-label="Canvas ${i + 1}, select to edit">
+          <span class="canvas-color-dot" style="background:${col.stroke}" title="Canvas ${i + 1}"></span>
+          <span>#${i} ${Math.round(sn.width)}×${Math.round(sn.height)}</span>
+          <button type="button" class="del" data-i="${i}">Remove</button>
+        </li>
+      `;
+      }).join("");
+      sectionsListEl.querySelectorAll(".canvas-list-item").forEach(li => {
+        li.addEventListener("click", (e) => {
+          if (e.target.classList.contains("del")) return;
+          const i = +li.dataset.i;
+          highlightedSectionIndex = i;
+          renderSectionsList();
+          redraw();
+          if (viewfinderEl) viewfinderEl.querySelectorAll(".viewfinder-item").forEach((el, idx) => {
+            el.classList.toggle("highlighted", idx === highlightedSectionIndex);
+          });
+          logStep("Canvas " + (i + 1) + " selected from list. Drag its corners on the image to adjust.");
+        });
+      });
+      sectionsListEl.querySelectorAll(".del").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const idx = +btn.dataset.i;
+          sections.splice(idx, 1);
+          if (highlightedSectionIndex === idx) highlightedSectionIndex = -1;
+          else if (highlightedSectionIndex > idx) highlightedSectionIndex--;
+          redraw();
+          renderSectionsList();
+          updateStepAndHint();
+          const remaining = sections.length;
+          if (remaining === 0) {
+            logStep("All canvases removed. Draw new ones.", true);
+            showMessage("All canvases removed. Draw new canvases.", "info");
+          } else {
+            logStep("Canvas " + (idx + 1) + " removed. " + remaining + " canvas/canvases remaining.");
+          }
+        });
+      });
+    }
+
+    function setCanvasFromImage(img) {
+      if (!img || !img.naturalWidth) return;
+      imgElement = img;
+      const maxW = (canvas.parentElement && canvas.parentElement.clientWidth) ? canvas.parentElement.clientWidth - 32 : 800;
+      const maxH = window.innerHeight - 220;
+      scale = Math.min(1, maxW / img.width, maxH / img.height);
+      canvas.width = img.width;
+      canvas.height = img.height;
+      canvas.style.width = (img.width * scale) + "px";
+      canvas.style.height = (img.height * scale) + "px";
+      redraw();
+      renderSectionsList();
+    }
+
+    btnExport.addEventListener("click", async () => {
+      if (!currentPath && !currentCorrectedPath) {
+        logStep("Export skipped: no image selected. Select or drop an image first.", true);
+        showMessage("Select or drop an image first.", "error");
+        return;
+      }
+      const nSections = sections.length;
+      btnExport.disabled = true;
+      setLoading(true, "Exporting " + nSections + " canvas/canvases…");
+      clearMessage();
+      logStep("Step 3: Exporting " + nSections + " canvas/canvases to outputs/ (perspective warp + manifest).");
+      showMessage("Exporting " + nSections + " canvas/canvases…", "info");
+      try {
+        const body = {
+          path: currentPath || "",
+          sections
+        };
+        if (currentCorrectedPath) body.corrected_path = currentCorrectedPath;
+        const r = await fetch(API + "/api/split", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await r.json();
+        if (data.error) throw new Error(data.error);
+        const n = data.sections?.length || 0;
+        const stem = data.output_folder || (data.source_filename || "").replace(/\.[^.]*$/, "");
+        const folderPath = "outputs/" + stem + "/";
+        const compositeName = data.composite_filename || stem + "_composite.png";
+        logStep("Step 3 complete: Exported " + n + " canvas/canvases to " + folderPath + ". Recreated full image: " + compositeName, true);
+        showMessage(
+          "Done! Exported " + n + " canvas/canvases to <strong>" + folderPath + "</strong>. " +
+          "Section images, <code>" + stem + "_manifest.json</code>, and the recreated full painting <code>" + compositeName + "</code> are in that folder.",
+          "success"
+        );
+        updateStepAndHint();
+      } catch (err) {
+        logStep("Export failed: " + err.message, true);
+        showMessage("Export failed: " + err.message, "error");
+      }
+      setLoading(false);
+      btnExport.disabled = false;
+    });
+
+    setLoading(true, "Loading app and fetching sample images…");
+    logStep("App starting: loading list of sample images from assets/…");
+    listAssets();
+  </script>
+</body>
+</html>

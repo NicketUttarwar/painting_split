@@ -47,3 +47,6 @@ outputs/
 
 # Local config overrides (optional)
 # config.local.toml
+
+# Secrets (never commit). Use scripts/make_sample_secrets.py to create secrets.example.yaml, then copy to secrets.yaml.
+secrets.yaml

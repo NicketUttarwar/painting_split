@@ -1,92 +1,84 @@
 # Painting Split
 
-Detect painting edges in camera-roll photos, correct perspective, and split multi-canvas images into the smallest usable sections.
+Retrieve just the painting images from photos. Upload a photo (wall, floor, carpet, or cluttered scene); the app detects only the painting(s), excludes background and objects, and saves extracted images to `data/extractions/`.
 
-**Requires Python 3.13.** The project config explicitly uses Python 3.13; see [Config](#config) below.
+**Requires Python 3.9+.**
 
 ## Install
 
 From the project root:
 
 ```bash
-# Use Python 3.13 on your machine (e.g. from Homebrew or python.org)
-python3.13 -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -e .
-```
-
-Or install from the dependency list only (no editable package):
-
-```bash
 pip install -r requirements.txt
 ```
 
-Or with [uv](https://docs.astral.sh/uv/):
+**Dependencies**: numpy, opencv-python-headless, Pillow, scikit-image, flask, werkzeug, openai, pyyaml.
+
+### OpenAI API key (for Retrieve paintings)
+
+The **Retrieve paintings** flow uses OpenAI vision with **painting-only** prompts and iterative refinement (5 passes) to find painting boundaries and exclude wall, floor, carpet, and art supplies. To enable it:
+
+1. Copy `secrets.example.yaml` to `secrets.yaml`.
+2. Set `openai.api_key` in `secrets.yaml` (from [platform.openai.com/api-keys](https://platform.openai.com/api-keys)).
+
+## Web app
+
+From the project root:
 
 ```bash
-uv venv --python 3.13
-source .venv/bin/activate
-uv pip install -e .
+cd /path/to/painting_split && source .venv/bin/activate && python app.py
 ```
 
-**Dependencies** (in `pyproject.toml` and `requirements.txt`): numpy, opencv-python, Pillow, scikit-image, scipy, matplotlib. The `requirements.txt` file is aligned with `pyproject.toml` so either install method reproduces the same environment.
+Or use `./run_web.sh`. Open the printed URL (e.g. `http://localhost:5001`) in your browser.
 
-## Run
+- **Inputs**: Upload photos to **data/inputs/** (drop zone or list). You can also pick from legacy **assets/**.
+- **Retrieve paintings**: Select an image and click **Retrieve paintings**. The app detects only the painting(s), extracts them (perspective-corrected), and writes to **data/extractions/<source_id>/** (`painting_0.png`, `painting_1.png`, …, `manifest.json`, `overlay.png`). View and download extracted images on the page.
+- **Legacy**: **Auto-detect** and **Export sections** still work (draw sections or use AI, then export to `outputs/`).
+
+## File layout
+
+| Path | Purpose |
+|------|--------|
+| `data/inputs/` | Uploaded photos (input images). |
+| `data/extractions/<source_id>/` | Extracted painting images, `manifest.json`, `overlay.png`. |
+| `data/runs/<source_id>/<run_id>/` | Detection run (manifest, overlay, original copy). |
+| `assets/` | Legacy input folder (still supported). |
+| `outputs/` | Legacy export folder for section split. |
+
+See **docs/ARCHITECTURE.md** for the full pipeline and API.
+
+## Scripts
+
+**Retrieve paintings from one image** (detect + extract, or extract from JSON):
 
 ```bash
-painting-split <input_dir> <output_dir>
+python scripts/retrieve_one.py <image_path>                  # detect then extract
+python scripts/retrieve_one.py <image_path> <sections.json>  # extract from sections JSON
 ```
 
-Example: process every image in `assets` and write sections to `output`:
+**Batch retrieval** (all images in data/inputs/):
 
 ```bash
-painting-split assets output
+python scripts/retrieve_paintings_batch.py [--inputs-dir DIR] [--extractions-dir DIR]
 ```
 
-- **input_dir**: Folder of images (e.g. `assets/` or camera roll exports). **Every image** in this directory is processed; by default subdirectories are included (use `--no-recursive` for top-level only). Supports JPEG, PNG, BMP, WebP, TIFF.
-- **output_dir**: Where to save cropped, perspective-corrected images (and split sections when internal boundaries are detected).
-
-Output files are named `{original_stem}_section_0.png`, `_section_1.png`, etc.
-
-### Options
-
-| Option | Description |
-|--------|-------------|
-| `--no-multi-canvas` | Disable splitting into multiple canvases; output one image per painting only. |
-| `--no-deskew` | Disable deskew step; do not correct small rotation of the canvas. |
-| `--max-deskew-degrees DEGREES` | Maximum rotation to apply when deskewing (default: 8.0). |
-| `--min-line-length-ratio RATIO` | Minimum line length as fraction of image for deskew (default: 0.12). |
-| `--min-area RATIO` | Minimum contour area as fraction of image (default: 0.05). |
-| `--canny-low`, `--canny-high` | Canny edge detection thresholds (defaults: 50, 150). |
-| `--padding N` | Pixels of padding around each corrected image (default: 0). |
-| `--extension {png,jpg,jpeg}` | Output format (default: png). |
-| `--no-recursive` | Only process images in the top-level of input_dir, not in subdirectories. |
-| `--visualize` | Save debug images (deskewed canvas) to `output_dir/debug/<stem>_debug.png`. |
-
-Example:
+**Split from sections JSON** (rects or quads to output dir):
 
 ```bash
-painting-split ./photos ./output --min-area 0.08 --padding 2
+python scripts/split_from_sections.py <image_path> '<sections_json>' [output_dir]
 ```
 
-## Config
+Sections JSON: array of `{ "x", "y", "width", "height" }` or `{ "corners": [[x,y], ...] }` (4 corners per section).
 
-The repo includes a **config file** that mentions the Python version and interpreter:
+## API (summary)
 
-- **`config.toml`**  
-  - `python_version = "3.13"`  
-  - `python_interpreter_path` — Optional. Set to the path of Python 3.13 on your machine (e.g. `/opt/homebrew/bin/python3.13` or `C:\Python313\python.exe`) if you want tooling or scripts to use that interpreter explicitly. Leave empty to use whichever `python3.13` is on your PATH.
-
-Create the virtual environment with that interpreter:
-
-```bash
-# If you set python_interpreter_path in config.toml, use it:
-/path/to/python3.13 -m venv .venv
-# Otherwise:
-python3.13 -m venv .venv
-```
-
-You can add a `[tuning]` section to `config.toml` with `min_area_ratio`, `canny_low`, `canny_high`, `padding`, `max_deskew_degrees`, or `min_line_length_ratio` to change default CLI values (CLI flags override).
+- `GET/POST /api/inputs` — list / upload to data/inputs/
+- `POST /api/retrieve-paintings` — run detection + extraction; returns `source_id`, `paintings[]`, `manifest_url`
+- `POST /api/retrieve-paintings-stream` — same as NDJSON stream (progress + extraction_done)
+- `GET /api/extractions` — list extractions; `GET /api/extractions/<source_id>/<filename>` — serve file
+- `GET /api/runs`, `GET /api/runs/<stem>/<run_id>/...` — detection runs
 
 ## Tests
 
@@ -95,13 +87,4 @@ pip install -e ".[dev]"
 pytest tests/ -v
 ```
 
-## How it works
-
-1. **Load** every image from the input directory (recursively by default). If OpenCV cannot read a file, Pillow is used with EXIF orientation applied so camera-roll photos appear upright.
-2. **Detect** the painting boundary (largest quad from edges/contours).
-3. **Perspective-correct** so the painting is front-facing (aspect ratio preserved).
-4. **Deskew**: The corrected canvas is analyzed for dominant line angles; a small rotation (clamped by `--max-deskew-degrees`) is applied so that horizontal/vertical lines align, improving later section detection.
-5. **Section split**: On the deskewed canvas, the pipeline finds **strong straight lines** in any direction and builds sections. If internal boundaries are found, the image is split into the smallest sections; otherwise the single corrected image is saved.
-6. **Save** each section as `{source_stem}_section_{i}.png` (or chosen extension).
-
-If no painting quad is found in an image, it is skipped and a warning is printed.
+Tests cover core, extraction, detection (parsing), and API. Some image_processor tests are skipped if no sample image is in `assets/`.

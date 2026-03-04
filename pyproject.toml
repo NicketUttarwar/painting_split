@@ -1,16 +1,18 @@
 [project]
 name = "painting-split"
 version = "0.1.0"
-description = "Detect painting edges in camera-roll photos, correct perspective, and split multi-canvas into smallest sections."
+description = "Split multi-canvas or single-canvas images into sections with coordinate metadata."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.9"
 dependencies = [
     "numpy>=2.0",
-    "opencv-python>=4.10",
-    "Pillow>=12.0",
-    "scikit-image>=0.25",
-    "scipy>=1.14",
-    "matplotlib>=3.9",
+    "opencv-python-headless>=4.8",
+    "Pillow>=10.0",
+    "scikit-image>=0.22",
+    "flask>=3.0",
+    "werkzeug>=3.0",
+    "openai>=1.0",
+    "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]
@@ -18,12 +20,6 @@ dev = [
     "pytest>=8.0",
 ]
 
-[project.scripts]
-painting-split = "painting_split.cli:main"
-
 [build-system]
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["src"]

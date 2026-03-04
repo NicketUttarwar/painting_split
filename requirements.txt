@@ -3,8 +3,14 @@
 # For editable install: pip install -e .
 
 numpy>=2.0
-opencv-python>=4.10
-Pillow>=12.0
-scikit-image>=0.25
-scipy>=1.14
-matplotlib>=3.9
+opencv-python-headless>=4.8
+Pillow>=10.0
+scikit-image>=0.22
+
+# Web app
+flask>=3.0
+werkzeug>=3.0
+
+# AI (OpenAI flagship vision for canvas detection)
+openai>=1.0
+pyyaml>=6.0
