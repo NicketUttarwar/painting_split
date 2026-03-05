@@ -1,0 +1,109 @@
+{
+  "source_filename": "2017-10-22_18-45-30_011.jpeg",
+  "source_width": 2592,
+  "source_height": 4608,
+  "sections": [
+    {
+      "index": 0,
+      "filename": "2017-10-22_18-45-30_011_section_0.png",
+      "bounds": {
+        "x": 118.4000015258789,
+        "y": 931.8857421875,
+        "width": 2472.228660583496,
+        "height": 1440.914306640625
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 2592,
+      "source_height": 4608,
+      "origin_x": 118.4000015258789,
+      "origin_y": 931.8857421875,
+      "width_px": 2472.228660583496,
+      "height_px": 1440.914306640625,
+      "corners": [
+        [
+          154.971435546875,
+          1078.17138671875
+        ],
+        [
+          118.4000015258789,
+          2336.228515625
+        ],
+        [
+          2590.628662109375,
+          2372.800048828125
+        ],
+        [
+          2583.314208984375,
+          931.8857421875
+        ]
+      ],
+      "centroid_x": 1361.82861328125,
+      "centroid_y": 1679.771484375,
+      "position_rank": 0
+    },
+    {
+      "index": 1,
+      "filename": "2017-10-22_18-45-30_011_section_1.png",
+      "bounds": {
+        "x": 74.5142822265625,
+        "y": 2358.17138671875,
+        "width": 2508.7999267578125,
+        "height": 1477.48583984375
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 2592,
+      "source_height": 4608,
+      "origin_x": 74.5142822265625,
+      "origin_y": 2358.17138671875,
+      "width_px": 2508.7999267578125,
+      "height_px": 1477.48583984375,
+      "corners": [
+        [
+          111.0857162475586,
+          2358.17138671875
+        ],
+        [
+          74.5142822265625,
+          3630.857177734375
+        ],
+        [
+          2583.314208984375,
+          3835.6572265625
+        ],
+        [
+          2583.314208984375,
+          2387.428466796875
+        ]
+      ],
+      "centroid_x": 1338.05712890625,
+      "centroid_y": 3053.028564453125,
+      "position_rank": 1
+    }
+  ],
+  "layout": {
+    "reading_order": [
+      0,
+      1
+    ],
+    "description": "Section indices in top-to-bottom, left-to-right order by centroid.",
+    "section_relations": [
+      {
+        "left_of": [],
+        "right_of": [],
+        "above": [],
+        "below": [
+          1
+        ]
+      },
+      {
+        "left_of": [],
+        "right_of": [],
+        "above": [
+          0
+        ],
+        "below": []
+      }
+    ]
+  },
+  "composite_filename": "2017-10-22_18-45-30_011_composite.png"
+}

@@ -1,0 +1,60 @@
+{
+  "source_filename": "2017-10-23_13-12-49_905.jpeg",
+  "source_width": 2592,
+  "source_height": 4608,
+  "sections": [
+    {
+      "index": 0,
+      "filename": "2017-10-23_13-12-49_905_section_0.png",
+      "bounds": {
+        "x": 89.14286041259766,
+        "y": 800.2285766601562,
+        "width": 2347.8857040405273,
+        "height": 2933.0285034179688
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 2592,
+      "source_height": 4608,
+      "origin_x": 89.14286041259766,
+      "origin_y": 800.2285766601562,
+      "width_px": 2347.8857040405273,
+      "height_px": 2933.0285034179688,
+      "corners": [
+        [
+          89.14286041259766,
+          800.2285766601562
+        ],
+        [
+          2437.028564453125,
+          829.4857177734375
+        ],
+        [
+          2437.028564453125,
+          3704.0
+        ],
+        [
+          154.971435546875,
+          3733.257080078125
+        ]
+      ],
+      "centroid_x": 1279.54296875,
+      "centroid_y": 2266.742919921875,
+      "position_rank": 0
+    }
+  ],
+  "layout": {
+    "reading_order": [
+      0
+    ],
+    "description": "Section indices in top-to-bottom, left-to-right order by centroid.",
+    "section_relations": [
+      {
+        "left_of": [],
+        "right_of": [],
+        "above": [],
+        "below": []
+      }
+    ]
+  },
+  "composite_filename": "2017-10-23_13-12-49_905_composite.png"
+}

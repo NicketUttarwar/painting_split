@@ -43,7 +43,7 @@ coverage.xml
 .DS_Store
 
 # Generated outputs
-outputs/
+# outputs/
 
 # Local config overrides (optional)
 # config.local.toml

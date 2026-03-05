@@ -1,0 +1,109 @@
+{
+  "source_filename": "2021-01-07_08-40-59_470.jpeg",
+  "source_width": 3840,
+  "source_height": 2160,
+  "sections": [
+    {
+      "index": 0,
+      "filename": "2021-01-07_08-40-59_470_section_0.png",
+      "bounds": {
+        "x": 164.57142639160156,
+        "y": 32.25,
+        "width": 1676.5713958740234,
+        "height": 2057.142822265625
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 3840,
+      "source_height": 2160,
+      "origin_x": 164.57142639160156,
+      "origin_y": 32.25,
+      "width_px": 1676.5713958740234,
+      "height_px": 2057.142822265625,
+      "corners": [
+        [
+          195.42857360839844,
+          32.25
+        ],
+        [
+          1841.142822265625,
+          59.67856979370117
+        ],
+        [
+          1824.0,
+          2075.678466796875
+        ],
+        [
+          164.57142639160156,
+          2089.392822265625
+        ]
+      ],
+      "centroid_x": 1006.2857055664062,
+      "centroid_y": 1064.25,
+      "position_rank": 0
+    },
+    {
+      "index": 1,
+      "filename": "2021-01-07_08-40-59_470_section_1.png",
+      "bounds": {
+        "x": 1981.7142333984375,
+        "y": 52.82143020629883,
+        "width": 1604.5714111328125,
+        "height": 2016.0001029968262
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 3840,
+      "source_height": 2160,
+      "origin_x": 1981.7142333984375,
+      "origin_y": 52.82143020629883,
+      "width_px": 1604.5714111328125,
+      "height_px": 2016.0001029968262,
+      "corners": [
+        [
+          1981.7142333984375,
+          2068.821533203125
+        ],
+        [
+          3586.28564453125,
+          2061.96435546875
+        ],
+        [
+          3576.0,
+          83.67857360839844
+        ],
+        [
+          1995.4285888671875,
+          52.82143020629883
+        ]
+      ],
+      "centroid_x": 2784.857177734375,
+      "centroid_y": 1066.821533203125,
+      "position_rank": 1
+    }
+  ],
+  "layout": {
+    "reading_order": [
+      0,
+      1
+    ],
+    "description": "Section indices in top-to-bottom, left-to-right order by centroid.",
+    "section_relations": [
+      {
+        "left_of": [],
+        "right_of": [
+          1
+        ],
+        "above": [],
+        "below": []
+      },
+      {
+        "left_of": [
+          0
+        ],
+        "right_of": [],
+        "above": [],
+        "below": []
+      }
+    ]
+  },
+  "composite_filename": "2021-01-07_08-40-59_470_composite.png"
+}
