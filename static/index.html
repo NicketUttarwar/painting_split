@@ -1194,11 +1194,12 @@
         const n = data.sections?.length || 0;
         const stem = data.output_folder || (data.source_filename || "").replace(/\.[^.]*$/, "");
         const folderPath = "outputs/" + stem + "/";
-        const compositeName = data.composite_filename || stem + "_composite.png";
+        const compositeName = data.composite_filename || "composite.png";
+        const manifestName = "manifest.json";
         logStep("Step 3 complete: Exported " + n + " canvas/canvases to " + folderPath + ". Recreated full image: " + compositeName, true);
         showMessage(
           "Done! Exported " + n + " canvas/canvases to <strong>" + folderPath + "</strong>. " +
-          "Section images, <code>" + stem + "_manifest.json</code>, and the recreated full painting <code>" + compositeName + "</code> are in that folder.",
+          "Section images (<code>section-0.png</code>, …), <code>" + manifestName + "</code>, <code>" + compositeName + "</code>, and <code>composite-recreated.png</code> are in that folder.",
           "success"
         );
         updateStepAndHint();

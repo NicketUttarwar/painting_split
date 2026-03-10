@@ -15,6 +15,9 @@ from image_processor import (
     split_image_from_rects,
     split_image_from_quads,
     SplitManifest,
+    recreate_composite_from_manifest,
+    COMPOSITE_FILENAME,
+    COMPOSITE_RECREATED_FILENAME,
 )
 
 # Paths relative to project root
@@ -147,8 +150,10 @@ def api_split():
             )
         out = manifest.to_dict()
         stem = safe_stem(manifest.source_filename)
-        out["composite_filename"] = f"{stem}_composite.png"
         out["output_folder"] = stem
+        if not out.get("composite_filename"):
+            out["composite_filename"] = COMPOSITE_FILENAME
+            out["composite_recreated_filename"] = COMPOSITE_RECREATED_FILENAME
         return jsonify(out)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -159,10 +164,10 @@ def list_outputs():
     """List manifests in outputs/ (including subfolders per source image)."""
     OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
     manifests = []
-    for path in sorted(OUTPUTS_DIR.rglob("*_manifest.json")):
+    for path in sorted(OUTPUTS_DIR.rglob("manifest.json")):
         try:
             m = SplitManifest.load_json(path)
-            # Path relative to outputs/ so client can request files (e.g. "my_image/my_image_manifest.json")
+            # Path relative to outputs/ (e.g. "my_image/manifest.json")
             rel = path.relative_to(OUTPUTS_DIR)
             manifests.append({
                 "path": str(rel).replace("\\", "/"),
@@ -172,15 +177,43 @@ def list_outputs():
                 "source_width": m.source_width,
                 "source_height": m.source_height,
                 "sections_count": len(m.sections),
+                "composite_filename": m.composite_filename,
+                "composite_recreated_filename": m.composite_recreated_filename,
+                "layout": m.layout,
             })
         except Exception:
             continue
     return jsonify(manifests)
 
 
+@app.route("/api/outputs/recreate", methods=["POST"])
+def api_recreate_composite():
+    """
+    Recreate the composite image from a saved manifest. Body: { "path": "folder/manifest.json" } (path relative to outputs/).
+    Uses only manifest data so behavior matches how sections were saved.
+    """
+    data = request.get_json() or {}
+    path_str = (data.get("path") or data.get("manifest_path") or "").strip().lstrip("/")
+    if not path_str:
+        return jsonify({"error": "Missing path or manifest_path"}), 400
+    path = (OUTPUTS_DIR / path_str).resolve()
+    root = OUTPUTS_DIR.resolve()
+    if not path.is_file():
+        return jsonify({"error": "Manifest not found"}), 404
+    try:
+        path.relative_to(root)
+    except ValueError:
+        return jsonify({"error": "Not found"}), 404
+    try:
+        recreate_composite_from_manifest(path)
+        return jsonify({"ok": True, "path": path_str})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/outputs/<path:filename>")
 def get_output(filename):
-    """Serve a file from outputs/ (supports subfolders, e.g. my_image/my_image_manifest.json)."""
+    """Serve a file from outputs/ (supports subfolders, e.g. my_image/manifest.json or my_image/section-0.png)."""
     path = (OUTPUTS_DIR / filename).resolve()
     root = OUTPUTS_DIR.resolve()
     if not path.is_file():

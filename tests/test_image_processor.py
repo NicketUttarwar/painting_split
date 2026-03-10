@@ -52,10 +52,11 @@ def test_split_produces_files_and_manifest():
     assert len(manifest.sections) == 4
     from image_processor import safe_stem
     stem = safe_stem(path.name)
+    section_dir = OUTPUTS / stem
     for i, s in enumerate(manifest.sections):
-        assert s.filename == f"{stem}_section_{i}.png"
-        assert (OUTPUTS / s.filename).is_file()
-    assert (OUTPUTS / f"{stem}_manifest.json").is_file()
+        assert s.filename == f"section-{i}.png"
+        assert (section_dir / s.filename).is_file()
+    assert (section_dir / "manifest.json").is_file()
 
 
 def test_load_image_returns_bgr_array():
