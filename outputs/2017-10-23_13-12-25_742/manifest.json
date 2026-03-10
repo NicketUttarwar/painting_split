@@ -1,0 +1,64 @@
+{
+  "source_filename": "2017-10-23_13-12-25_742.jpeg",
+  "source_width": 2592,
+  "source_height": 4608,
+  "sections": [
+    {
+      "index": 0,
+      "filename": "section-0.png",
+      "bounds": {
+        "x": 23.314285278320312,
+        "y": 931.8857421875,
+        "width": 2559.9999237060547,
+        "height": 3262.17138671875
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 2592,
+      "source_height": 4608,
+      "section_type": "quad",
+      "output_width_px": 2553,
+      "output_height_px": 3262,
+      "origin_x": 23.314285278320312,
+      "origin_y": 931.8857421875,
+      "width_px": 2559.9999237060547,
+      "height_px": 3262.17138671875,
+      "corners": [
+        [
+          30.628570556640625,
+          931.8857421875
+        ],
+        [
+          2576.0,
+          931.8857421875
+        ],
+        [
+          2583.314208984375,
+          4194.05712890625
+        ],
+        [
+          23.314285278320312,
+          4194.05712890625
+        ]
+      ],
+      "position_rank": 0,
+      "centroid_x": 1303.3143310546875,
+      "centroid_y": 2562.971435546875
+    }
+  ],
+  "composite_filename": "composite.png",
+  "composite_recreated_filename": "composite-recreated.png",
+  "layout": {
+    "reading_order": [
+      0
+    ],
+    "description": "Section indices in top-to-bottom, left-to-right order by centroid.",
+    "section_relations": [
+      {
+        "left_of": [],
+        "right_of": [],
+        "above": [],
+        "below": []
+      }
+    ]
+  }
+}

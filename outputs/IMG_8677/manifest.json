@@ -1,0 +1,116 @@
+{
+  "source_filename": "IMG_8677.JPG",
+  "source_width": 4032,
+  "source_height": 2268,
+  "sections": [
+    {
+      "index": 0,
+      "filename": "section-0.png",
+      "bounds": {
+        "x": 230.39999389648438,
+        "y": 678.2625122070312,
+        "width": 561.6000061035156,
+        "height": 799.2000122070312
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 4032,
+      "source_height": 2268,
+      "section_type": "quad",
+      "output_width_px": 551,
+      "output_height_px": 790,
+      "origin_x": 230.39999389648438,
+      "origin_y": 678.2625122070312,
+      "width_px": 561.6000061035156,
+      "height_px": 799.2000122070312,
+      "corners": [
+        [
+          230.39999389648438,
+          678.2625122070312
+        ],
+        [
+          784.7999877929688,
+          692.6624755859375
+        ],
+        [
+          792.0,
+          1477.4625244140625
+        ],
+        [
+          244.8000030517578,
+          1473.862548828125
+        ]
+      ],
+      "position_rank": 1,
+      "centroid_x": 513.0,
+      "centroid_y": 1080.5625
+    },
+    {
+      "index": 1,
+      "filename": "section-1.png",
+      "bounds": {
+        "x": 3060.0,
+        "y": 685.4625244140625,
+        "width": 511.199951171875,
+        "height": 777.5999755859375
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 4032,
+      "source_height": 2268,
+      "section_type": "quad",
+      "output_width_px": 506,
+      "output_height_px": 754,
+      "origin_x": 3060.0,
+      "origin_y": 685.4625244140625,
+      "width_px": 511.199951171875,
+      "height_px": 777.5999755859375,
+      "corners": [
+        [
+          3060.0,
+          714.2625122070312
+        ],
+        [
+          3571.199951171875,
+          685.4625244140625
+        ],
+        [
+          3567.60009765625,
+          1445.0625
+        ],
+        [
+          3067.199951171875,
+          1463.0625
+        ]
+      ],
+      "position_rank": 0,
+      "centroid_x": 3316.500244140625,
+      "centroid_y": 1076.9625244140625
+    }
+  ],
+  "composite_filename": "composite.png",
+  "composite_recreated_filename": "composite-recreated.png",
+  "layout": {
+    "reading_order": [
+      1,
+      0
+    ],
+    "description": "Section indices in top-to-bottom, left-to-right order by centroid.",
+    "section_relations": [
+      {
+        "left_of": [],
+        "right_of": [
+          1
+        ],
+        "above": [],
+        "below": []
+      },
+      {
+        "left_of": [
+          0
+        ],
+        "right_of": [],
+        "above": [],
+        "below": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "source_filename": "2017-10-22_18-45-30_011.jpeg",
+  "source_width": 2592,
+  "source_height": 4608,
+  "sections": [
+    {
+      "index": 0,
+      "filename": "section-0.png",
+      "bounds": {
+        "x": 118.4000015258789,
+        "y": 939.2000122070312,
+        "width": 2472.228660583496,
+        "height": 1440.9142456054688
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 2592,
+      "source_height": 4608,
+      "section_type": "quad",
+      "output_width_px": 2453,
+      "output_height_px": 1346,
+      "origin_x": 118.4000015258789,
+      "origin_y": 939.2000122070312,
+      "width_px": 2472.228660583496,
+      "height_px": 1440.9142456054688,
+      "corners": [
+        [
+          154.971435546875,
+          1085.4857177734375
+        ],
+        [
+          2583.314208984375,
+          939.2000122070312
+        ],
+        [
+          2590.628662109375,
+          2380.1142578125
+        ],
+        [
+          118.4000015258789,
+          2336.228515625
+        ]
+      ],
+      "position_rank": 0,
+      "centroid_x": 1361.8284912109375,
+      "centroid_y": 1685.257080078125
+    },
+    {
+      "index": 1,
+      "filename": "section-1.png",
+      "bounds": {
+        "x": 74.5142822265625,
+        "y": 2358.17138671875,
+        "width": 2508.7999267578125,
+        "height": 1484.800048828125
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 2592,
+      "source_height": 4608,
+      "section_type": "quad",
+      "output_width_px": 2495,
+      "output_height_px": 1364,
+      "origin_x": 74.5142822265625,
+      "origin_y": 2358.17138671875,
+      "width_px": 2508.7999267578125,
+      "height_px": 1484.800048828125,
+      "corners": [
+        [
+          111.0857162475586,
+          2358.17138671875
+        ],
+        [
+          2583.314208984375,
+          2394.742919921875
+        ],
+        [
+          2583.314208984375,
+          3842.971435546875
+        ],
+        [
+          74.5142822265625,
+          3638.17138671875
+        ]
+      ],
+      "position_rank": 1,
+      "centroid_x": 1338.0570068359375,
+      "centroid_y": 3058.51416015625
+    }
+  ],
+  "composite_filename": "composite.png",
+  "composite_recreated_filename": "composite-recreated.png",
+  "layout": {
+    "reading_order": [
+      0,
+      1
+    ],
+    "description": "Section indices in top-to-bottom, left-to-right order by centroid.",
+    "section_relations": [
+      {
+        "left_of": [],
+        "right_of": [],
+        "above": [],
+        "below": [
+          1
+        ]
+      },
+      {
+        "left_of": [],
+        "right_of": [],
+        "above": [
+          0
+        ],
+        "below": []
+      }
+    ]
+  }
+}

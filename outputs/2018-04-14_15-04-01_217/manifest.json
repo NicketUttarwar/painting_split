@@ -1,0 +1,297 @@
+{
+  "source_filename": "2018-04-14_15-04-01_217.jpeg",
+  "source_width": 3024,
+  "source_height": 4032,
+  "sections": [
+    {
+      "index": 0,
+      "filename": "section-0.png",
+      "bounds": {
+        "x": 852.7999877929688,
+        "y": 930.5999755859375,
+        "width": 742.3999633789062,
+        "height": 992.0
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 3024,
+      "source_height": 4032,
+      "section_type": "quad",
+      "output_width_px": 729,
+      "output_height_px": 941,
+      "origin_x": 852.7999877929688,
+      "origin_y": 930.5999755859375,
+      "width_px": 742.3999633789062,
+      "height_px": 992.0,
+      "corners": [
+        [
+          865.5999755859375,
+          930.5999755859375
+        ],
+        [
+          1595.199951171875,
+          1013.7999877929688
+        ],
+        [
+          1576.0,
+          1922.5999755859375
+        ],
+        [
+          852.7999877929688,
+          1903.4000244140625
+        ]
+      ],
+      "position_rank": 1,
+      "centroid_x": 1222.39990234375,
+      "centroid_y": 1442.5999755859375
+    },
+    {
+      "index": 1,
+      "filename": "section-1.png",
+      "bounds": {
+        "x": 1595.199951171875,
+        "y": 828.2000122070312,
+        "width": 812.800048828125,
+        "height": 780.7999877929688
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 3024,
+      "source_height": 4032,
+      "section_type": "quad",
+      "output_width_px": 799,
+      "output_height_px": 698,
+      "origin_x": 1595.199951171875,
+      "origin_y": 828.2000122070312,
+      "width_px": 812.800048828125,
+      "height_px": 780.7999877929688,
+      "corners": [
+        [
+          1608.0,
+          828.2000122070312
+        ],
+        [
+          2408.0,
+          949.7999877929688
+        ],
+        [
+          2382.39990234375,
+          1609.0
+        ],
+        [
+          1595.199951171875,
+          1564.199951171875
+        ]
+      ],
+      "position_rank": 0,
+      "centroid_x": 1998.39990234375,
+      "centroid_y": 1237.800048828125
+    },
+    {
+      "index": 2,
+      "filename": "section-2.png",
+      "bounds": {
+        "x": 1576.0,
+        "y": 1577.0,
+        "width": 806.39990234375,
+        "height": 710.39990234375
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 3024,
+      "source_height": 4032,
+      "section_type": "quad",
+      "output_width_px": 785,
+      "output_height_px": 685,
+      "origin_x": 1576.0,
+      "origin_y": 1577.0,
+      "width_px": 806.39990234375,
+      "height_px": 710.39990234375,
+      "corners": [
+        [
+          1595.199951171875,
+          1577.0
+        ],
+        [
+          2382.39990234375,
+          1621.800048828125
+        ],
+        [
+          2356.800048828125,
+          2281.0
+        ],
+        [
+          1576.0,
+          2287.39990234375
+        ]
+      ],
+      "position_rank": 2,
+      "centroid_x": 1977.5999755859375,
+      "centroid_y": 1941.7999267578125
+    },
+    {
+      "index": 3,
+      "filename": "section-3.png",
+      "bounds": {
+        "x": 1556.800048828125,
+        "y": 2287.39990234375,
+        "width": 806.39990234375,
+        "height": 716.800048828125
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 3024,
+      "source_height": 4032,
+      "section_type": "quad",
+      "output_width_px": 785,
+      "output_height_px": 685,
+      "origin_x": 1556.800048828125,
+      "origin_y": 2287.39990234375,
+      "width_px": 806.39990234375,
+      "height_px": 716.800048828125,
+      "corners": [
+        [
+          1576.0,
+          2293.800048828125
+        ],
+        [
+          2363.199951171875,
+          2287.39990234375
+        ],
+        [
+          2337.60009765625,
+          2946.60009765625
+        ],
+        [
+          1556.800048828125,
+          3004.199951171875
+        ]
+      ],
+      "position_rank": 4,
+      "centroid_x": 1958.39990234375,
+      "centroid_y": 2633.0
+    },
+    {
+      "index": 4,
+      "filename": "section-4.png",
+      "bounds": {
+        "x": 820.7999877929688,
+        "y": 1909.800048828125,
+        "width": 761.6000366210938,
+        "height": 966.39990234375
+      },
+      "rotation_degrees": 0.0,
+      "source_width": 3024,
+      "source_height": 4032,
+      "section_type": "quad",
+      "output_width_px": 737,
+      "output_height_px": 928,
+      "origin_x": 820.7999877929688,
+      "origin_y": 1909.800048828125,
+      "width_px": 761.6000366210938,
+      "height_px": 966.39990234375,
+      "corners": [
+        [
+          1556.800048828125,
+          2818.60009765625
+        ],
+        [
+          820.7999877929688,
+          2876.199951171875
+        ],
+        [
+          846.4000244140625,
+          1909.800048828125
+        ],
+        [
+          1582.4000244140625,
+          1929.0
+        ]
+      ],
+      "position_rank": 3,
+      "centroid_x": 1201.5999755859375,
+      "centroid_y": 2383.39990234375
+    }
+  ],
+  "composite_filename": "composite.png",
+  "composite_recreated_filename": "composite-recreated.png",
+  "layout": {
+    "reading_order": [
+      1,
+      0,
+      2,
+      4,
+      3
+    ],
+    "description": "Section indices in top-to-bottom, left-to-right order by centroid.",
+    "section_relations": [
+      {
+        "left_of": [],
+        "right_of": [
+          1,
+          2
+        ],
+        "above": [
+          1
+        ],
+        "below": [
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "left_of": [
+          0
+        ],
+        "right_of": [],
+        "above": [],
+        "below": [
+          0,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "left_of": [
+          0,
+          4
+        ],
+        "right_of": [],
+        "above": [
+          0,
+          1
+        ],
+        "below": [
+          3,
+          4
+        ]
+      },
+      {
+        "left_of": [
+          4
+        ],
+        "right_of": [],
+        "above": [
+          0,
+          1,
+          2,
+          4
+        ],
+        "below": []
+      },
+      {
+        "left_of": [],
+        "right_of": [
+          2,
+          3
+        ],
+        "above": [
+          0,
+          1,
+          2
+        ],
+        "below": [
+          3
+        ]
+      }
+    ]
+  }
+}
